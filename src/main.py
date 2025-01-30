@@ -13,7 +13,11 @@ from app.utils import get_message_from_concerts
 ALL_PARSERS: list[ConcertHallParser] = [
     KzlParser("https://kozlovclub.ru", "Kozlov"),
     EsseParser("https://www.jazzesse.ru", "Esse"),
-    BtParser("https://moscow.butmanclub.ru", "Butman")
+    BtParser("https://moscow.butmanclub.ru", "Butman"),
+    JamClubParser(
+        "https://jamclub.ticketscloud.org/?tags=%D0%9A%D0%BE%D0%BD%D1%86%D0%B5%D1%80%D1%82%D1%8B&city=524901&starts_at=today&price=",
+        "JamClub"
+    )
 ]
 
 

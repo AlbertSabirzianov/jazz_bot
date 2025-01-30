@@ -1,6 +1,7 @@
 from .enums import HtmlPageElements, HtmlAttrs, HtmlClassNames
 from .interfaces import ConcertHallParser
 from .schema import Concert
+from .utils import concat_urls
 
 
 class KzlParser(ConcertHallParser):
@@ -60,3 +61,22 @@ class BtParser(ConcertHallParser):
                 hall_name=self.hall_name
             )
         ]
+
+
+class JamClubParser(ConcertHallParser):
+    def get_today_concerts(self) -> list[Concert]:
+        divs = self.soup.find_all(
+            HtmlPageElements.DIV.value,
+            class_=HtmlClassNames.TICKETSCLOUD_EVENT.value
+        )[1:]
+        concerts = []
+        for div in divs:
+            concerts.append(
+                Concert(
+                    name=div.find(HtmlPageElements.H3.value).text,
+                    hall_name=self.hall_name,
+                    url=concat_urls(self.parse_url, div.find(HtmlPageElements.A.value).get(HtmlAttrs.HREF.value))
+                )
+            )
+        return concerts
+

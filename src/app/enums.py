@@ -21,3 +21,4 @@ class HtmlClassNames(Enum):
     TODAY_1 = "today_1"
     AF_ACTIVE = "afishaItem active"
     LINK_RESET = "uk-link-reset"
+    TICKETSCLOUD_EVENT = "ticketscloud-event-item col-md-4"

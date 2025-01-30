@@ -1,3 +1,5 @@
+from urllib.parse import urlparse, urlunparse, urljoin
+
 from .schema import Concert
 
 
@@ -38,3 +40,11 @@ def get_message_from_concerts(concerts: list[Concert]) -> str:
         message += f"📍 *{escape_markdown(concert.name)}*\n[{concert.hall_name}]({concert.url})\n\n"
     return message
 
+
+def concat_urls(base_url: str, relative_url: str) -> str:
+    # Парсим базовый URL
+    parsed_base = urlparse(base_url)
+    # Создаем новый URL без параметров
+    new_base = urlunparse(parsed_base._replace(query=''))
+    # Соединяем новый базовый URL с относительным URL
+    return urljoin(new_base, relative_url)
