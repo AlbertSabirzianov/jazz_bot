@@ -19,7 +19,13 @@ class KzlParser(ConcertHallParser):
                     ).get(
                         HtmlAttrs.HREF.value
                     ),
-                    hall_name=self.hall_name
+                    hall_name=self.hall_name,
+                    time=str(
+                        d.find(
+                            HtmlPageElements.DIV.value,
+                            class_=HtmlClassNames.ROW_ROW_1.value
+                        ).text
+                    ).split(" | ")[1]
                 )
             )
         return concerts
@@ -45,7 +51,8 @@ class EsseParser(ConcertHallParser):
                     ).get(
                         HtmlAttrs.HREF.value
                     ).replace('\t', '').replace('\n', ''),
-                    hall_name=self.hall_name
+                    hall_name=self.hall_name,
+                    time=d.find(HtmlPageElements.DIV.value, class_=HtmlClassNames.HOUR.value).text
                 )
             )
         return concerts
@@ -53,12 +60,13 @@ class EsseParser(ConcertHallParser):
 
 class BtParser(ConcertHallParser):
     def get_today_concerts(self) -> list[Concert]:
-        div = self.soup.find(HtmlPageElements.A.value, class_=HtmlClassNames.LINK_RESET.value)
+        divs = self.soup.find_all(HtmlPageElements.A.value, class_=HtmlClassNames.LINK_RESET.value)
         return [
             Concert(
-                name=div.find(HtmlPageElements.IMG.value).get(HtmlAttrs.ALT.value),
-                url=self.parse_url + div.get(HtmlAttrs.HREF.value),
-                hall_name=self.hall_name
+                name=divs[0].find(HtmlPageElements.IMG.value).get(HtmlAttrs.ALT.value),
+                url=self.parse_url + divs[0].get(HtmlAttrs.HREF.value),
+                hall_name=self.hall_name,
+                time=divs[1].find(HtmlPageElements.P.value).text.split(" / ")[1]
             )
         ]
 
@@ -75,7 +83,8 @@ class JamClubParser(ConcertHallParser):
                 Concert(
                     name=div.find(HtmlPageElements.H3.value).text,
                     hall_name=self.hall_name,
-                    url=concat_urls(self.parse_url, div.find(HtmlPageElements.A.value).get(HtmlAttrs.HREF.value))
+                    url=concat_urls(self.parse_url, div.find(HtmlPageElements.A.value).get(HtmlAttrs.HREF.value)),
+                    time=div.find(HtmlPageElements.TIME.value).text.split()[1]
                 )
             )
         return concerts

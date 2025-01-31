@@ -37,7 +37,7 @@ def escape_markdown(text):
 def get_message_from_concerts(concerts: list[Concert]) -> str:
     message = escape_markdown("🌟 Сегодня!\n")
     for concert in concerts:
-        message += f"📍 *{escape_markdown(concert.name)}*\n[{concert.hall_name}]({concert.url})\n\n"
+        message += f"📍 *{escape_markdown(concert.name)}*\n[{concert.hall_name}]({concert.url}) {concert.time}\n\n"
     return message
 
 
