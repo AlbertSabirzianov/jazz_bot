@@ -26,3 +26,6 @@ class HtmlClassNames(Enum):
     TICKETSCLOUD_EVENT = "ticketscloud-event-item col-md-4"
     ROW_ROW_1 = "row row_1"
     HOUR = "houre"
+    COVER = "cover"
+    ARTIST = "artist"
+

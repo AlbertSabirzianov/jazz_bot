@@ -81,10 +81,41 @@ class JamClubParser(ConcertHallParser):
         for div in divs:
             concerts.append(
                 Concert(
-                    name=div.find(HtmlPageElements.H3.value).text,
+                    name=div.find(HtmlPageElements.H3.value).text.replace('\n', ''),
                     hall_name=self.hall_name,
                     url=concat_urls(self.parse_url, div.find(HtmlPageElements.A.value).get(HtmlAttrs.HREF.value)),
                     time=div.find(HtmlPageElements.TIME.value).text.split()[1]
+                )
+            )
+        return concerts
+
+
+class UCClubParser(ConcertHallParser):
+    def get_today_concerts(self) -> list[Concert]:
+        divs = self.soup.find_all(HtmlPageElements.DIV.value, class_=HtmlClassNames.COVER.value)
+        today_divs = list(
+            filter(
+                lambda x: "СЕГОДНЯ" in x.find(
+                    HtmlPageElements.DIV.value,
+                    class_=HtmlClassNames.TITLE.value
+                ).text,
+                divs
+            )
+        )
+        concerts = []
+        for div in today_divs:
+            concerts.append(
+                Concert(
+                    name=div.find(
+                        HtmlPageElements.DIV.value,
+                        class_=HtmlClassNames.ARTIST.value
+                    ).text.split('\n')[0],
+                    hall_name=self.hall_name,
+                    url=self.parse_url + div.find(HtmlPageElements.A.value).get(HtmlAttrs.HREF.value),
+                    time=div.find(
+                        HtmlPageElements.DIV.value,
+                        class_=HtmlClassNames.TITLE.value
+                    ).text.split()[1]
                 )
             )
         return concerts

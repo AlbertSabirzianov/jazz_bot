@@ -34,11 +34,20 @@ def escape_markdown(text):
     return text
 
 
-def get_message_from_concerts(concerts: list[Concert]) -> str:
-    message = escape_markdown("🌟 Сегодня!\n")
+def get_message_from_concerts(concerts: list[Concert], day_time: str) -> str:
+    message = escape_markdown(f"🌟 Сегодня {day_time}!\n\n")
     for concert in concerts:
-        message += f"📍 *{escape_markdown(concert.name)}*\n[{concert.hall_name}]({concert.url}) {concert.time}\n\n"
+        message += f"📍 *{escape_markdown(concert.name.strip())}*\n[{concert.hall_name}]({concert.url}) {concert.time}\n\n"
     return message
+
+
+def get_day_time_concerts_dict(concerts: list[Concert]) -> dict[str, list[Concert]]:
+    return {
+        "утром": list(filter(lambda x: x.hour < 12, concerts)),
+        "днём": list(filter(lambda x: 12 <= x.hour <= 17, concerts)),
+        "вечером": list(filter(lambda x: 17 < x.hour < 23, concerts)),
+        "ночью": list(filter(lambda x: x.hour >= 23, concerts))
+    }
 
 
 def concat_urls(base_url: str, relative_url: str) -> str:
