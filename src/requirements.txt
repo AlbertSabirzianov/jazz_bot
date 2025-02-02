@@ -3,3 +3,4 @@ beautifulsoup4
 lxml
 pydantic-settings
 python-telegram-bot
+schedule

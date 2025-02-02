@@ -1,14 +1,12 @@
 import asyncio
-import datetime
-import pprint
 import time
 
-from telegram import Bot
+import schedule
 from dotenv import load_dotenv
+from telegram import Bot
 
-from app.interfaces import ConcertHallParser
 from app.parsers import *
-from app.settings import TelegramSettings
+from app.settings import TelegramSettings, PublicSettings
 from app.utils import get_message_from_concerts, get_day_time_concerts_dict
 
 ALL_PARSERS: list[ConcertHallParser] = [
@@ -46,19 +44,21 @@ def get_messages_from_dict(day_time_concerts_dict: dict[str, list[Concert]]) -> 
 
 
 def main():
-    load_dotenv()
     telegram_settings = TelegramSettings()
-    while True:
-        concerts: list[Concert] = get_all_concerts(ALL_PARSERS)
-        day_time_concerts_dict: dict[str, list[Concert]] = get_day_time_concerts_dict(concerts)
-        messages: list[str] = get_messages_from_dict(day_time_concerts_dict)
-        for message in messages:
-            bot = Bot(token=telegram_settings.bot_token)
-            asyncio.run(
-                bot.send_message(chat_id=telegram_settings.chanel_name, text=message, parse_mode='MarkdownV2')
-            )
-        time.sleep(datetime.timedelta(days=1).total_seconds())
+    concerts: list[Concert] = get_all_concerts(ALL_PARSERS)
+    day_time_concerts_dict: dict[str, list[Concert]] = get_day_time_concerts_dict(concerts)
+    messages: list[str] = get_messages_from_dict(day_time_concerts_dict)
+    for message in messages:
+        bot = Bot(token=telegram_settings.bot_token)
+        asyncio.run(
+            bot.send_message(chat_id=telegram_settings.chanel_name, text=message, parse_mode='MarkdownV2')
+        )
 
 
 if __name__ == "__main__":
-    main()
+    load_dotenv()
+    publish_settings = PublicSettings()
+    schedule.every().day.at(publish_settings.time_to_publish).do(main)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
