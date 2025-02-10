@@ -1,12 +1,9 @@
 import asyncio
-import time
-
-import schedule
 from dotenv import load_dotenv
 from telegram import Bot
 
 from app.parsers import *
-from app.settings import TelegramSettings, PublicSettings
+from app.settings import TelegramSettings
 from app.utils import get_message_from_concerts, get_day_time_concerts_dict
 
 ALL_PARSERS: list[ConcertHallParser] = [
@@ -57,8 +54,4 @@ def main():
 
 if __name__ == "__main__":
     load_dotenv()
-    publish_settings = PublicSettings()
-    schedule.every().day.at(publish_settings.time_to_publish).do(main)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    main()
