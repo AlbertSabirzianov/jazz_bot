@@ -10,9 +10,12 @@ from .utils import get_message_from_concerts, get_day_time_concerts_dict
 def get_all_concerts(all_parsers: list[ConcertHallParser]) -> list[Concert]:
     concerts = []
     for parser in all_parsers:
-        for concert in parser.get_today_concerts():
-            print(concert)
-            concerts.append(concert)
+        try:
+            for concert in parser.get_today_concerts():
+                print(concert)
+                concerts.append(concert)
+        except Exception:
+            pass
     return concerts
 
 
