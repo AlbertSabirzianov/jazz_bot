@@ -1,12 +1,10 @@
-import asyncio
 from dotenv import load_dotenv
-from telegram import Bot
 
 from app.parsers import *
+from app.services import send_concerts_to_chanel
 from app.settings import TelegramSettings
-from app.utils import get_message_from_concerts, get_day_time_concerts_dict
 
-ALL_PARSERS: list[ConcertHallParser] = [
+ALL_MOSCOW_PARSERS: list[ConcertHallParser] = [
     KzlParser("https://kozlovclub.ru", "Джаз Клуб Алексея Козлова"),
     EsseParser("https://www.jazzesse.ru", "Джаз Клуб Эссе"),
     BtParser("https://moscow.butmanclub.ru", "Клуб Игоря Бутмана"),
@@ -18,37 +16,24 @@ ALL_PARSERS: list[ConcertHallParser] = [
 ]
 
 
-def get_all_concerts(all_parsers: list[ConcertHallParser]) -> list[Concert]:
-    concerts = []
-    for parser in all_parsers:
-        for concert in parser.get_today_concerts():
-            print(concert)
-            concerts.append(concert)
-    return concerts
-
-
-def get_messages_from_dict(day_time_concerts_dict: dict[str, list[Concert]]) -> list[str]:
-    messages: list[str] = []
-    for day_time in day_time_concerts_dict.keys():
-        if day_time_concerts_dict[day_time]:
-            messages.append(
-                get_message_from_concerts(
-                    day_time_concerts_dict[day_time],
-                    day_time
-                )
-            )
-    return messages
+ALL_ST_PARSERS: list[ConcertHallParser] = [
+    BtParser("https://spb.butmanclub.ru/", "Клуб Игоря Бутмана"),
+    PhilharmonicJazzHall("https://jazz-hall.ru/afisha", "Филармония джазовой музыки"),
+    JFCParser("https://jfc-club.spb.ru", "JFC Jazz Club")
+]
 
 
 def main():
     telegram_settings = TelegramSettings()
-    concerts: list[Concert] = get_all_concerts(ALL_PARSERS)
-    day_time_concerts_dict: dict[str, list[Concert]] = get_day_time_concerts_dict(concerts)
-    messages: list[str] = get_messages_from_dict(day_time_concerts_dict)
-    for message in messages:
-        bot = Bot(token=telegram_settings.bot_token)
-        asyncio.run(
-            bot.send_message(chat_id=telegram_settings.chanel_name, text=message, parse_mode='MarkdownV2')
+    chanel_and_parsers: list[tuple[str, list[ConcertHallParser]]] = [
+        (telegram_settings.moscow_chanel_name, ALL_MOSCOW_PARSERS),
+        (telegram_settings.st_chanel_name, ALL_ST_PARSERS)
+    ]
+    for chanel_name, parsers in chanel_and_parsers:
+        send_concerts_to_chanel(
+            chanel_name=chanel_name,
+            parsers=parsers,
+            bot_token=telegram_settings.bot_token
         )
 
 

@@ -1,3 +1,7 @@
+import datetime
+
+import bs4
+
 from .enums import HtmlPageElements, HtmlAttrs, HtmlClassNames
 from .interfaces import ConcertHallParser
 from .schema import Concert
@@ -120,3 +124,90 @@ class UCClubParser(ConcertHallParser):
             )
         return concerts
 
+
+class PhilharmonicJazzHall(ConcertHallParser):
+    def get_today_concerts(self) -> list[Concert]:
+        divs = self.soup.find_all(
+            HtmlPageElements.DIV.value,
+            class_="afisha__list-item afisha__list-item-sale "
+        )
+        divs = list(
+            filter(
+                lambda div: str(datetime.datetime.now().day) in div.find(
+                    HtmlPageElements.DIV.value,
+                    class_="afisha__list-item-date "
+                ).text,
+                divs
+            )
+        )
+        return [
+            Concert(
+                hall_name=self.hall_name,
+                url=self.parse_url + str(
+                    div.find(
+                        HtmlPageElements.A.value
+                    ).get(
+                        HtmlAttrs.HREF.value
+                    )
+                ).replace("/afisha", ""),
+                name=div.find_all(
+                    HtmlPageElements.DIV.value
+                )[-1].find(
+                    HtmlPageElements.DIV.value
+                ).find(
+                    HtmlPageElements.A.value
+                ).text,
+                time=div.find_all(
+                    HtmlPageElements.DIV.value
+                )[-1].find(
+                    HtmlPageElements.DIV.value
+                ).find(
+                    HtmlPageElements.P.value
+                ).text
+            ) for div in divs
+        ]
+
+
+class JFCParser(ConcertHallParser):
+
+    @staticmethod
+    def __is_today_concert(div: bs4.BeautifulSoup) -> bool:
+        day = div.find(
+            HtmlPageElements.DIV.value,
+            class_="bprev_date"
+        ).text[:5]
+        return int(
+            day.split(".")[0]
+        ) == datetime.datetime.now().day and int(
+            day.split(".")[1]
+        ) == datetime.datetime.now().month
+
+    def get_today_concerts(self) -> list[Concert]:
+        divs = self.soup.find_all(
+            HtmlPageElements.DIV.value,
+            class_="bprev"
+        )
+        divs = list(
+            filter(
+                self.__is_today_concert,
+                divs
+            )
+        )
+        return [
+            Concert(
+                hall_name=self.hall_name,
+                url=self.parse_url + div.find(
+                    HtmlPageElements.DIV.value,
+                    class_="bprev_link"
+                ).find(
+                    HtmlPageElements.A.value
+                ).get(HtmlAttrs.HREF.value),
+                time=div.find(HtmlPageElements.SPAN.value, class_="concert_time").text,
+                name=div.find(
+                    HtmlPageElements.DIV.value,
+                    class_="bprev_link"
+                ).find(
+                    HtmlPageElements.A.value
+                ).get(HtmlAttrs.TITLE.value).split("/")[1]
+            ) for div in divs
+        ]

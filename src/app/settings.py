@@ -4,7 +4,8 @@ from pydantic_settings import BaseSettings
 class TelegramSettings(BaseSettings):
 
     bot_token: str
-    chanel_name: str
+    moscow_chanel_name: str
+    st_chanel_name: str
 
 
 

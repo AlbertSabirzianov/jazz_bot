@@ -16,6 +16,7 @@ class HtmlPageElements(Enum):
 class HtmlAttrs(Enum):
     HREF = "href"
     ALT = "alt"
+    TITLE = "title"
 
 
 class HtmlClassNames(Enum):

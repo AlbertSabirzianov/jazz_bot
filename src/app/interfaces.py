@@ -17,6 +17,7 @@ class ConcertHallParser(ABC):
         while True:
             try:
                 response = requests.get(self.parse_url)
+                response.encoding = 'utf-8'
                 return BeautifulSoup(response.text, features="lxml")
             except requests.exceptions.RequestException:
                 print(f"Can not connect to {self.parse_url}")
