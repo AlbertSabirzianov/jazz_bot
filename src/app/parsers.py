@@ -1,6 +1,8 @@
 import datetime
 
 import bs4
+import requests
+from bs4 import BeautifulSoup
 
 from .enums import HtmlPageElements, HtmlAttrs, HtmlClassNames
 from .interfaces import ConcertHallParser
@@ -129,13 +131,13 @@ class PhilharmonicJazzHall(ConcertHallParser):
     def get_today_concerts(self) -> list[Concert]:
         divs = self.soup.find_all(
             HtmlPageElements.DIV.value,
-            class_="afisha__list-item afisha__list-item-sale "
-        )
+            class_="afisha__list-item afisha__list-item-sale"
+        )[:3]
         divs = list(
             filter(
                 lambda div: str(datetime.datetime.now().day) in div.find(
                     HtmlPageElements.DIV.value,
-                    class_="afisha__list-item-date "
+                    class_="afisha__list-item-date"
                 ).text,
                 divs
             )
@@ -150,20 +152,22 @@ class PhilharmonicJazzHall(ConcertHallParser):
                         HtmlAttrs.HREF.value
                     )
                 ).replace("/afisha", ""),
-                name=div.find_all(
-                    HtmlPageElements.DIV.value
-                )[-1].find(
+                name=div.find(
+                    HtmlPageElements.DIV.value,
+                    class_="afisha__list-item-content"
+                ).find(
                     HtmlPageElements.DIV.value
                 ).find(
                     HtmlPageElements.A.value
-                ).text,
-                time=div.find_all(
-                    HtmlPageElements.DIV.value
-                )[-1].find(
+                ).text.replace("\t", "").replace("\n", ""),
+                time=div.find(
+                    HtmlPageElements.DIV.value,
+                    class_="afisha__list-item-content"
+                ).find(
                     HtmlPageElements.DIV.value
                 ).find(
                     HtmlPageElements.P.value
-                ).text
+                ).text.replace("\t", "").replace("\n", "")
             ) for div in divs
         ]
 
@@ -209,5 +213,40 @@ class JFCParser(ConcertHallParser):
                 ).find(
                     HtmlPageElements.A.value
                 ).get(HtmlAttrs.TITLE.value).split("/")[1]
+            ) for div in divs
+        ]
+
+
+class PoliceStationParser(ConcertHallParser):
+
+    @property
+    def soup(self) -> BeautifulSoup:
+        while True:
+            try:
+                response = requests.get(self.parse_url)
+                return BeautifulSoup(response.json()['html'], features="lxml")
+            except requests.exceptions.RequestException:
+                print(f"Can not connect to {self.parse_url}")
+
+    def get_today_concerts(self) -> list[Concert]:
+        divs = self.soup.find_all(
+            HtmlPageElements.DIV.value,
+            class_="wb-afisha__event"
+        )
+        divs = filter(
+            lambda x: "Сегодня" in x.find(HtmlPageElements.DIV.value, class_="wb-afisha__weekday").text,
+            divs
+        )
+        return [
+            Concert(
+                hall_name=self.hall_name,
+                url=div.find(HtmlPageElements.A.value).get(HtmlAttrs.HREF.value),
+                name=div.find(HtmlPageElements.A.value).text,
+                time=str(
+                    div.find(
+                        HtmlPageElements.DIV.value,
+                        class_="wb-afisha__start-time"
+                    ).text
+                ).split()[-1]
             ) for div in divs
         ]

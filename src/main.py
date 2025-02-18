@@ -19,7 +19,11 @@ ALL_MOSCOW_PARSERS: list[ConcertHallParser] = [
 ALL_ST_PARSERS: list[ConcertHallParser] = [
     BtParser("https://spb.butmanclub.ru/", "Клуб Игоря Бутмана"),
     PhilharmonicJazzHall("https://jazz-hall.ru/afisha", "Филармония джазовой музыки"),
-    JFCParser("https://jfc-club.spb.ru", "JFC Jazz Club")
+    JFCParser("https://jfc-club.spb.ru", "JFC Jazz Club"),
+    PoliceStationParser(
+        "https://wdt.bileter.ru/fd4773edb1ce0fd129b5cf61332a3c0c/ru/afisha/get-afisha?type=table",
+        "ДЖАЗ-КЛУБ POLICE STATION"
+    )
 ]
 
 
