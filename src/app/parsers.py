@@ -240,8 +240,12 @@ class PoliceStationParser(ConcertHallParser):
         return [
             Concert(
                 hall_name=self.hall_name,
-                url=div.find(HtmlPageElements.A.value).get(HtmlAttrs.HREF.value),
-                name=div.find(HtmlPageElements.A.value).text,
+                url="https://police-station.ru",
+                name=str(
+                    div.find(
+                        HtmlPageElements.DIV.value,
+                        class_="wb-afisha__event-name"
+                    ).text.replace("\n", "")).strip(),
                 time=str(
                     div.find(
                         HtmlPageElements.DIV.value,
