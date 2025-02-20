@@ -22,7 +22,7 @@ ALL_ST_PARSERS: list[ConcertHallParser] = [
     JFCParser("https://jfc-club.spb.ru", "JFC Jazz Club"),
     PoliceStationParser(
         "https://wdt.bileter.ru/fd4773edb1ce0fd129b5cf61332a3c0c/ru/afisha/get-afisha?type=table",
-        "ДЖАЗ-КЛУБ POLICE STATION"
+        "ДЖАЗ КЛУБ POLICE STATION"
     )
 ]
 
