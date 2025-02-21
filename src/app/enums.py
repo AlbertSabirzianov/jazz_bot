@@ -9,6 +9,7 @@ class HtmlPageElements(Enum):
     ARTICLE = "article"
     H5 = "h5"
     H3 = "h3"
+    H4 = "h4"
     P = "p"
     TIME = "time"
 

@@ -254,3 +254,46 @@ class PoliceStationParser(ConcertHallParser):
                 ).split()[-1]
             ) for div in divs
         ]
+
+
+class TatPhilharmonicParser(ConcertHallParser):
+    def get_today_concerts(self) -> list[Concert]:
+        divs = self.soup.find_all(HtmlPageElements.DIV.value, class_="poster-item")
+        divs = filter(
+            lambda x: int(
+                x.find(
+                    HtmlPageElements.SPAN.value,
+                    class_="poster-item__date-number"
+                ).text
+            ) == datetime.datetime.now().day and x.find(HtmlPageElements.SPAN.value, class_="label").text == "Джаз",
+            divs
+        )
+        return [
+            Concert(
+                hall_name=self.hall_name,
+                url=self.parse_url + div.find(HtmlPageElements.A.value).get(HtmlAttrs.HREF.value),
+                name=div.find(HtmlPageElements.H4.value).text,
+                time=div.find(HtmlPageElements.SPAN.value, class_="poster-item__time").text
+            ) for div in divs
+        ]
+
+
+class OldPianoParser(ConcertHallParser):
+    def get_today_concerts(self) -> list[Concert]:
+        response = requests.get(
+            self.parse_url.replace(
+                "<timeMin_value>",
+                (datetime.datetime.now() + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+            ).replace(
+                "<timeMax_value>",
+                datetime.datetime.now().strftime('%Y-%m-%d')
+            )
+        )
+        return [
+            Concert(
+                hall_name=self.hall_name,
+                url="http://starroyal.ru",
+                name=str(item["summary"]).split("/")[0],
+                time=str(item["start"]["dateTime"]).split("T")[1][:5]
+            ) for item in response.json()["items"]
+        ]
