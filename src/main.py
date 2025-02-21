@@ -41,13 +41,21 @@ ALL_KZ_PARSERS: list[ConcertHallParser] = [
     )
 ]
 
+ALL_ROSTOV_PARSERS: list[ConcertHallParser] = [
+    RostovEsseParser(
+        "https://essedon.ru/api/v1/events/active?offset=0&limit=10",
+        "Джаз Клуб Эссе"
+    )
+]
+
 
 def main():
     telegram_settings = TelegramSettings()
     chanel_and_parsers: list[tuple[str, list[ConcertHallParser]]] = [
         (telegram_settings.moscow_chanel_name, ALL_MOSCOW_PARSERS),
         (telegram_settings.st_chanel_name, ALL_ST_PARSERS),
-        (telegram_settings.kz_chanel_name, ALL_KZ_PARSERS)
+        (telegram_settings.kz_chanel_name, ALL_KZ_PARSERS),
+        (telegram_settings.rostov_chanel_name, ALL_ROSTOV_PARSERS)
     ]
     for chanel_name, parsers in chanel_and_parsers:
         send_concerts_to_chanel(

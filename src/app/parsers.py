@@ -297,3 +297,20 @@ class OldPianoParser(ConcertHallParser):
                 time=str(item["start"]["dateTime"]).split("T")[1][:5]
             ) for item in response.json()["items"]
         ]
+
+
+class RostovEsseParser(ConcertHallParser):
+    def get_today_concerts(self) -> list[Concert]:
+        response = requests.get(self.parse_url)
+        items = filter(
+            lambda item: item["date"] == datetime.datetime.now().strftime('%Y-%m-%d'),
+            response.json()["events"]
+        )
+        return [
+            Concert(
+                hall_name=self.hall_name,
+                url=item["tcLink"],
+                name=item["title"],
+                time=item["time"]
+            ) for item in items
+        ]

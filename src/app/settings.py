@@ -7,6 +7,7 @@ class TelegramSettings(BaseSettings):
     moscow_chanel_name: str
     st_chanel_name: str
     kz_chanel_name: str
+    rostov_chanel_name: str
 
 
 
