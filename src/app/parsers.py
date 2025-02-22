@@ -280,14 +280,11 @@ class TatPhilharmonicParser(ConcertHallParser):
 
 class OldPianoParser(ConcertHallParser):
     def get_today_concerts(self) -> list[Concert]:
-        response = requests.get(
-            self.parse_url.replace(
-                "<timeMin_value>",
-                (datetime.datetime.now() + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-            ).replace(
-                "<timeMax_value>",
-                datetime.datetime.now().strftime('%Y-%m-%d')
-            )
+        self.set_query_params(
+            {
+                "<timeMin_value>": (datetime.datetime.now() + datetime.timedelta(days=1)).strftime('%Y-%m-%d'),
+                "<timeMax_value>": datetime.datetime.now().strftime('%Y-%m-%d')
+            }
         )
         return [
             Concert(
@@ -295,16 +292,15 @@ class OldPianoParser(ConcertHallParser):
                 url="http://starroyal.ru",
                 name=str(item["summary"]).split("/")[0],
                 time=str(item["start"]["dateTime"]).split("T")[1][:5]
-            ) for item in response.json()["items"]
+            ) for item in self.response.json()["items"]
         ]
 
 
 class RostovEsseParser(ConcertHallParser):
     def get_today_concerts(self) -> list[Concert]:
-        response = requests.get(self.parse_url)
         items = filter(
             lambda item: item["date"] == datetime.datetime.now().strftime('%Y-%m-%d'),
-            response.json()["events"]
+            self.response.json()["events"]
         )
         return [
             Concert(

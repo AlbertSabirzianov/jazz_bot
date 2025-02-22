@@ -12,6 +12,18 @@ class ConcertHallParser(ABC):
         self.parse_url: str = url
         self.hall_name: str = hall_name
 
+    def set_query_params(self, params: dict[str, str]) -> None:
+        for key, value in params.items():
+            self.parse_url.replace(key, value)
+
+    @property
+    def response(self) -> requests.Response:
+        while True:
+            try:
+                return requests.get(self.parse_url)
+            except requests.exceptions.RequestException:
+                print(f"Can not connect to {self.parse_url}")
+
     @property
     def soup(self) -> BeautifulSoup:
         while True:
