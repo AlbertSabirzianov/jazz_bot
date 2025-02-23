@@ -14,7 +14,7 @@ class ConcertHallParser(ABC):
 
     def set_query_params(self, params: dict[str, str]) -> None:
         for key, value in params.items():
-            self.parse_url.replace(key, value)
+            self.parse_url = self.parse_url.replace(key, value)
 
     @property
     def response(self) -> requests.Response:
