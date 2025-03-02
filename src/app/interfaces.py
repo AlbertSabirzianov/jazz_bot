@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from .schema import Concert
+from .exceptions import AddressNotAllowed
 
 
 class ConcertHallParser(ABC):
@@ -18,21 +19,27 @@ class ConcertHallParser(ABC):
 
     @property
     def response(self) -> requests.Response:
-        while True:
+        count = 3
+        while count:
             try:
                 return requests.get(self.parse_url)
             except requests.exceptions.RequestException:
                 print(f"Can not connect to {self.parse_url}")
+                count -= 1
+        raise AddressNotAllowed(f"Address {self.hall_name} not allowed")
 
     @property
     def soup(self) -> BeautifulSoup:
-        while True:
+        count = 3
+        while count:
             try:
                 response = requests.get(self.parse_url)
                 response.encoding = 'utf-8'
                 return BeautifulSoup(response.text, features="lxml")
             except requests.exceptions.RequestException:
                 print(f"Can not connect to {self.parse_url}")
+                count -= 1
+        raise AddressNotAllowed(f"Address {self.hall_name} not allowed")
 
     @abstractmethod
     def get_today_concerts(self) -> list[Concert]:

@@ -1,0 +1,2 @@
+class AddressNotAllowed(Exception):
+    pass
