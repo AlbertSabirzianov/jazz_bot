@@ -87,7 +87,7 @@ class JamClubParser(ConcertHallParser):
         for div in divs:
             concerts.append(
                 Concert(
-                    name=div.find(HtmlPageElements.H3.value).text.replace('\n', ''),
+                    name=div.find(HtmlPageElements.P.value).text.replace('\n', ''),
                     hall_name=self.hall_name,
                     url=concat_urls(self.parse_url, div.find(HtmlPageElements.A.value).get(HtmlAttrs.HREF.value)),
                     time=div.find(HtmlPageElements.TIME.value).text.split()[1]

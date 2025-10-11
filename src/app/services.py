@@ -38,12 +38,13 @@ def get_all_concerts(all_parsers: list[ConcertHallParser]) -> list[Concert]:
                 print(concert)
                 concerts.append(concert)
         except Exception as err:
-            send_message_to_chanel(
-                chanel_name=telegram_settings.test_chanel_name,
-                bot_token=telegram_settings.bot_token,
-                message=f"Error in {parser.hall_name}" + "\n" + str(err),
-                parse_mode=None
-            )
+            pass
+            # send_message_to_chanel(
+            #     chanel_name=telegram_settings.test_chanel_name,
+            #     bot_token=telegram_settings.bot_token,
+            #     message=f"Error in {parser.hall_name}" + "\n" + str(err),
+            #     parse_mode=None
+            # )
     return concerts
 
 
