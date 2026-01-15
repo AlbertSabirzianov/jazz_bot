@@ -299,14 +299,14 @@ class OldPianoParser(ConcertHallParser):
 class RostovEsseParser(ConcertHallParser):
     def get_today_concerts(self) -> list[Concert]:
         items = filter(
-            lambda item: item["date"] == datetime.datetime.now().strftime('%Y-%m-%d'),
-            self.response.json()["events"]
+            lambda item: item["date"].split("T")[0] == datetime.datetime.now().strftime('%Y-%m-%d'),
+            self.response.json()["data"]
         )
         return [
             Concert(
                 hall_name=self.hall_name,
-                url=item["tcLink"],
+                url=item["booking_url"],
                 name=item["title"],
-                time=item["time"]
+                time=item["date"].split("T")[1]
             ) for item in items
         ]

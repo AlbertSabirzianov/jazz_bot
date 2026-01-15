@@ -43,7 +43,7 @@ ALL_KZ_PARSERS: list[ConcertHallParser] = [
 
 ALL_ROSTOV_PARSERS: list[ConcertHallParser] = [
     RostovEsseParser(
-        "https://essedon.ru/api/v1/events/active?offset=0&limit=10",
+        "https://essedon.ru/api/events?/limit=9&offset=0&is_active=true",
         "Джаз Клуб Эссе"
     )
 ]
