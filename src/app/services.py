@@ -1,3 +1,17 @@
+"""
+Модуль для работы с Telegram API и отправки уведомлений о концертах
+
+Данный модуль содержит функционал для:
+* Отправки сообщений в Telegram-каналы
+* Обработки ошибок при отправке
+* Агрегации данных о концертах
+* Форматирования и отправки уведомлений
+
+Основные компоненты:
+* Декоратор для повторных попыток отправки
+* Функции для работы с концертами
+* Методы отправки сообщений в каналы
+"""
 import asyncio
 from typing import Optional
 
@@ -11,6 +25,15 @@ from .settings import TelegramSettings
 
 
 def retry_until_success(func):
+    """
+    Декоратор для повторных попыток отправки сообщений
+
+    Параметры:
+    func: Функция, которую нужно обернуть
+
+    Возвращает:
+    wrapper: Обернутая функция с обработкой ошибок
+    """
     def wrapper(*args, **kwargs):
         while True:
             try:
@@ -23,6 +46,15 @@ def retry_until_success(func):
 
 @retry_until_success
 def send_message_to_chanel(chanel_name: str, bot_token: str, message: str, parse_mode: Optional[str] = 'MarkdownV2') -> None:
+    """
+    Отправка сообщения в Telegram-канал
+
+    Параметры:
+    chanel_name (str): Имя канала
+    bot_token (str): Токен бота
+    message (str): Текст сообщения
+    parse_mode (Optional[str]): Режим парсинга (по умолчанию MarkdownV2)
+    """
     bot = Bot(token=bot_token)
     asyncio.run(
         bot.send_message(chat_id=chanel_name, text=message, parse_mode=parse_mode)
@@ -30,25 +62,36 @@ def send_message_to_chanel(chanel_name: str, bot_token: str, message: str, parse
 
 
 def get_all_concerts(all_parsers: list[ConcertHallParser]) -> list[Concert]:
-    telegram_settings = TelegramSettings()
+    """
+    Получение всех концертов от всех парсеров
+
+    Параметры:
+    all_parsers (list[ConcertHallParser]): Список парсеров
+
+    Возвращает:
+    list[Concert]: Список всех концертов
+    """
     concerts = []
     for parser in all_parsers:
         try:
             for concert in parser.get_today_concerts():
                 print(concert)
                 concerts.append(concert)
-        except Exception as err:
+        except Exception:
             pass
-            # send_message_to_chanel(
-            #     chanel_name=telegram_settings.test_chanel_name,
-            #     bot_token=telegram_settings.bot_token,
-            #     message=f"Error in {parser.hall_name}" + "\n" + str(err),
-            #     parse_mode=None
-            # )
     return concerts
 
 
 def get_messages_from_dict(day_time_concerts_dict: dict[str, list[Concert]]) -> list[str]:
+    """
+    Формирование сообщений из словаря концертов
+
+    Параметры:
+    day_time_concerts_dict (dict[str, list[Concert]]): Словарь концертов по времени
+
+    Возвращает:
+    list[str]: Список готовых сообщений
+    """
     messages: list[str] = []
     for day_time in day_time_concerts_dict.keys():
         if day_time_concerts_dict[day_time]:
@@ -62,6 +105,14 @@ def get_messages_from_dict(day_time_concerts_dict: dict[str, list[Concert]]) -> 
 
 
 def send_concerts_to_chanel(chanel_name: str, parsers: list[ConcertHallParser], bot_token: str) -> None:
+    """
+    Основная функция отправки концертов в канал
+
+    Параметры:
+    chanel_name (str): Имя канала
+    parsers (list[ConcertHallParser]): Список парсеров
+    bot_token (str): Токен бота
+    """
     concerts: list[Concert] = get_all_concerts(parsers)
     day_time_concerts_dict: dict[str, list[Concert]] = get_day_time_concerts_dict(concerts)
     messages: list[str] = get_messages_from_dict(day_time_concerts_dict)
