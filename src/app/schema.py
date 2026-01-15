@@ -1,3 +1,5 @@
+import re
+
 from pydantic import BaseModel
 
 
@@ -11,4 +13,5 @@ class Concert(BaseModel):
     def hour(self) -> int:
         if not self.time:
             self.time = "19:00"
-        return int(self.time.split(":")[0])
+        return int(re.split(r'[:.]', self.time)[0])
+        #return int(self.time.split(":")[0])
