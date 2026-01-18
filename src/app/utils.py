@@ -65,7 +65,8 @@ def get_message_from_concerts(concerts: list[Concert], day_time: str) -> str:
     """
     message = escape_markdown(f"🌟 Сегодня {day_time}!\n\n")
     for concert in concerts:
-        message += f"📍 *{escape_markdown(concert.name.strip())}*\n[{concert.hall_name}]({concert.url}) {concert.time}\n\n"
+        message += (f"📍 *{escape_markdown(concert.name.strip())}*\n[{escape_markdown(concert.hall_name)}]"
+                    f"({escape_markdown(concert.url)}) {escape_markdown(concert.time)}\n\n")
     return message
 
 
