@@ -324,7 +324,7 @@ class RostovEsseParser(ConcertHallParser):
         return [
             Concert(
                 hall_name=self.hall_name,
-                url=item["booking_url"],
+                url=str(item["booking_url"]) if item["booking_url"] else "https://essedon.ru",
                 name=item["title"],
                 time=item["date"].split("T")[1]
             ) for item in items
