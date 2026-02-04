@@ -33,7 +33,7 @@ class KzlParser(ConcertHallParser):
 
     def get_today_concerts(self) -> list[Concert]:
         concerts: list = []
-        divs = self.soup.find_all(HtmlPageElements.DIV.value, class_=HtmlClassNames.TODAY_1.value)
+        divs = self.selenium_soup().find_all(HtmlPageElements.DIV.value, class_=HtmlClassNames.TODAY_1.value)
         for d in divs:
             concerts.append(
                 Concert(
